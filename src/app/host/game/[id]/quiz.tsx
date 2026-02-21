@@ -3,6 +3,21 @@ import { Answer, Participant, Question, supabase } from '@/types/types'
 import { useEffect, useRef, useState } from 'react'
 import { CountdownCircleTimer } from 'react-countdown-circle-timer'
 
+const HEBREW_RE = /[\u0590-\u05FF]/
+
+function hasHebrew(text: string) {
+  return HEBREW_RE.test(text)
+}
+
+function SmartDirText({ text }: { text: string }) {
+  const dir = hasHebrew(text) ? 'rtl' : 'ltr'
+  return (
+    <span dir={dir} style={{ unicodeBidi: 'plaintext' }}>
+      {text}
+    </span>
+  )
+}
+
 export default function Quiz({
   question: question,
   questionCount: questionCount,
@@ -108,7 +123,7 @@ export default function Quiz({
 
       <div className="text-center">
         <h2 className="pb-4 text-3xl bg-white font-bold mx-24 my-12 p-4 rounded inline-block">
-          {question.body}
+          <SmartDirText text={question.body} />
         </h2>
       </div>
 
@@ -203,7 +218,7 @@ export default function Quiz({
                 ${isAnswerRevealed && !choice.is_correct ? 'opacity-60' : ''}
                `}
               >
-                <div>{choice.body}</div>
+                <div><SmartDirText text={choice.body} /></div>
                 {isAnswerRevealed && (
                   <div>
                     {choice.is_correct && (
